@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -82,16 +81,33 @@
 
     const weatherIcons = {
       0: { text: "Despejado", icon: "☀️", bg: "sunny.jpg" },
-      1: { text: "Mayormente despejado", icon: "🌤️", bg: "sunny.jpg" },
+      1: { text: "Principalmente despejado", icon: "🌤️", bg: "sunny.jpg" },
       2: { text: "Parcialmente nublado", icon: "⛅", bg: "cloudy.jpg" },
       3: { text: "Nublado", icon: "☁️", bg: "cloudy.jpg" },
       45: { text: "Niebla", icon: "🌫️", bg: "foggy.jpg" },
       48: { text: "Niebla con escarcha", icon: "🌫️", bg: "foggy.jpg" },
       51: { text: "Llovizna ligera", icon: "🌦️", bg: "rain.jpg" },
+      53: { text: "Llovizna moderada", icon: "🌧️", bg: "rain.jpg" },
+      55: { text: "Llovizna intensa", icon: "🌧️", bg: "rain.jpg" },
+      56: { text: "Llovizna helada ligera", icon: "🌧️", bg: "snow.jpg" },
+      57: { text: "Llovizna helada intensa", icon: "🌧️", bg: "snow.jpg" },
       61: { text: "Lluvia ligera", icon: "🌧️", bg: "rain.jpg" },
-      71: { text: "Nieve ligera", icon: "🌨️", bg: "snow.jpg" },
-      80: { text: "Chubascos", icon: "🌦️", bg: "rain.jpg" },
-      95: { text: "Tormentas", icon: "⛈️", bg: "storm.jpg" }
+      63: { text: "Lluvia moderada", icon: "🌧️", bg: "rain.jpg" },
+      65: { text: "Lluvia intensa", icon: "🌧️", bg: "rain.jpg" },
+      66: { text: "Lluvia helada ligera", icon: "🌧️", bg: "snow.jpg" },
+      67: { text: "Lluvia helada intensa", icon: "🌧️", bg: "snow.jpg" },
+      71: { text: "Nevada ligera", icon: "🌨️", bg: "snow.jpg" },
+      73: { text: "Nevada moderada", icon: "🌨️", bg: "snow.jpg" },
+      75: { text: "Nevada intensa", icon: "❄️", bg: "snow.jpg" },
+      77: { text: "Granizo", icon: "🌨️", bg: "snow.jpg" },
+      80: { text: "Chubascos ligeros", icon: "🌦️", bg: "rain.jpg" },
+      81: { text: "Chubascos moderados", icon: "🌧️", bg: "rain.jpg" },
+      82: { text: "Chubascos violentos", icon: "🌧️", bg: "storm.jpg" },
+      85: { text: "Chubascos de nieve ligera", icon: "🌨️", bg: "snow.jpg" },
+      86: { text: "Chubascos de nieve intensa", icon: "❄️", bg: "snow.jpg" },
+      95: { text: "Tormenta ligera o moderada", icon: "⛈️", bg: "storm.jpg" },
+      96: { text: "Tormenta con granizo ligera", icon: "⛈️", bg: "storm.jpg" },
+      99: { text: "Tormenta con granizo fuerte", icon: "⛈️", bg: "storm.jpg" }
     };
 
     async function getWeather() {
@@ -101,10 +117,12 @@
 
       const current = data.current_weather;
       const currentCode = current.weathercode;
-      const bg = weatherIcons[currentCode] ? weatherIcons[currentCode].bg : "default.jpg";
-      document.body.style.backgroundImage = `url('https://numerobiks.github.io/screenlynews/img/${bg}')`;
+      const currentInfo = weatherIcons[currentCode] || { text: "Condición desconocida", icon: "❓", bg: "default.jpg" };
+      console.log("Código actual del clima:", currentCode);
 
-      document.getElementById("current").textContent = `Ahora: ${current.temperature}°C, Viento: ${current.windspeed} km/h – ${weatherIcons[currentCode]?.text || "Condición desconocida"}`;
+      document.body.style.backgroundImage = `url('https://numerobiks.github.io/screenlynews/img/${currentInfo.bg}')`;
+
+      document.getElementById("current").textContent = `Ahora: ${current.temperature}°C, Viento: ${current.windspeed} km/h – ${currentInfo.text}`;
 
       const daily = data.daily;
       const forecast = document.getElementById("forecast");
@@ -112,15 +130,14 @@
         const date = new Date(daily.time[i]);
         const name = date.toLocaleDateString("es-ES", { weekday: "short" });
         const code = daily.weathercode[i];
-        const icon = weatherIcons[code] ? weatherIcons[code].icon : "❓";
-        const label = weatherIcons[code] ? weatherIcons[code].text : "Desconocido";
+        const info = weatherIcons[code] || { text: "Desconocido", icon: "❓" };
 
         const day = document.createElement("div");
         day.className = "day";
         day.innerHTML = `
           <h3>${name}</h3>
-          <div class="icon">${icon}</div>
-          <div>${label}</div>
+          <div class="icon">${info.icon}</div>
+          <div>${info.text}</div>
           <div class="temp">${daily.temperature_2m_max[i]}° / ${daily.temperature_2m_min[i]}°</div>
           <div class="precip">💧 ${daily.precipitation_sum[i]} mm</div>
         `;
