@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Noticias para pantalla</title>
+  <style>
+    body { margin: 0; overflow: hidden; }
+  </style>
+</head>
+<body>
+  <!-- Tu iframe de FeedWind va aquí -->
+ <div id="c_b097456dd406c2e1065b22fbf5350cb1" class="completo"></div><script type="text/javascript" src="https://www.eltiempo.es/widget/widget_loader/b097456dd406c2e1065b22fbf5350cb1"></script>
+</body>
+</html>
