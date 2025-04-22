@@ -210,7 +210,7 @@ const weatherIcons = {
 
     async function startNewsCarousel() {
       try {
-        const res = await fetch("https://api.rss2json.com/v1/api.json?rss_url=https://feeds.elpais.com/mrss-s/pages/ep/site/elpais.com/portada");
+        const res = await fetch("https://api.rss2json.com/v1/api.json?rss_url=https://www.20minutos.es/rss/ultimas-noticias/");
         const data = await res.json();
         const items = data.items.slice(0, 6);
         let index = 0;
@@ -243,4 +243,3 @@ const weatherIcons = {
   </script>
 </body>
 </html>
-
