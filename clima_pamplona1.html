@@ -1,0 +1,134 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Tiempo en Pamplona</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: 'Segoe UI', sans-serif;
+      color: #fff;
+      background-size: cover;
+      background-position: center;
+    }
+
+    .overlay {
+      background-color: rgba(0, 0, 0, 0.55);
+      width: 100%;
+      height: 100%;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    h1 {
+      font-size: 3em;
+      margin-top: 0;
+      text-align: center;
+    }
+
+    #current {
+      text-align: center;
+      font-size: 1.8em;
+      margin-bottom: 30px;
+    }
+
+    #forecast {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .day {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 10px;
+      padding: 15px;
+      text-align: center;
+      width: 150px;
+      backdrop-filter: blur(5px);
+    }
+
+    .day h3 {
+      margin: 0;
+      font-size: 1.2em;
+    }
+
+    .temp, .precip {
+      font-size: 1.1em;
+      margin-top: 5px;
+    }
+
+    .icon {
+      width: 48px;
+      height: 48px;
+    }
+  </style>
+</head>
+<body>
+  <div class="overlay">
+    <h1>Tiempo en Pamplona</h1>
+    <div id="current">Cargando...</div>
+    <div id="forecast"></div>
+  </div>
+
+  <script>
+    const LAT = 42.8125;
+    const LON = -1.6458;
+    const forecastDays = 5;
+
+    const weatherIcons = {
+      0: { text: "Despejado", icon: "☀️", bg: "sunny.jpg" },
+      1: { text: "Mayormente despejado", icon: "🌤️", bg: "sunny.jpg" },
+      2: { text: "Parcialmente nublado", icon: "⛅", bg: "cloudy.jpg" },
+      3: { text: "Nublado", icon: "☁️", bg: "cloudy.jpg" },
+      45: { text: "Niebla", icon: "🌫️", bg: "foggy.jpg" },
+      48: { text: "Niebla con escarcha", icon: "🌫️", bg: "foggy.jpg" },
+      51: { text: "Llovizna ligera", icon: "🌦️", bg: "rain.jpg" },
+      61: { text: "Lluvia ligera", icon: "🌧️", bg: "rain.jpg" },
+      71: { text: "Nieve ligera", icon: "🌨️", bg: "snow.jpg" },
+      80: { text: "Chubascos", icon: "🌦️", bg: "rain.jpg" },
+      95: { text: "Tormentas", icon: "⛈️", bg: "storm.jpg" }
+    };
+
+    async function getWeather() {
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current_weather=true&daily=temperature_2m_max,temperature_2m_min,weathercode,precipitation_sum&timezone=Europe%2FMadrid`;
+      const res = await fetch(url);
+      const data = await res.json();
+
+      const current = data.current_weather;
+      const currentCode = current.weathercode;
+      const bg = weatherIcons[currentCode] ? weatherIcons[currentCode].bg : "default.jpg";
+      document.body.style.backgroundImage = `url('https://numerobiks.github.io/screenlynews/img/${bg}')`;
+
+      document.getElementById("current").textContent = `Ahora: ${current.temperature}°C, Viento: ${current.windspeed} km/h – ${weatherIcons[currentCode]?.text || "Condición desconocida"}`;
+
+      const daily = data.daily;
+      const forecast = document.getElementById("forecast");
+      for (let i = 0; i < forecastDays; i++) {
+        const date = new Date(daily.time[i]);
+        const name = date.toLocaleDateString("es-ES", { weekday: "short" });
+        const code = daily.weathercode[i];
+        const icon = weatherIcons[code] ? weatherIcons[code].icon : "❓";
+        const label = weatherIcons[code] ? weatherIcons[code].text : "Desconocido";
+
+        const day = document.createElement("div");
+        day.className = "day";
+        day.innerHTML = `
+          <h3>${name}</h3>
+          <div class="icon">${icon}</div>
+          <div>${label}</div>
+          <div class="temp">${daily.temperature_2m_max[i]}° / ${daily.temperature_2m_min[i]}°</div>
+          <div class="precip">💧 ${daily.precipitation_sum[i]} mm</div>
+        `;
+        forecast.appendChild(day);
+      }
+    }
+
+    getWeather();
+  </script>
+</body>
+</html>
