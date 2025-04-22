@@ -18,7 +18,6 @@
       color: white;
       overflow: hidden;
     }
-
     .overlay {
       position: absolute;
       width: 100%;
@@ -26,24 +25,20 @@
       background-color: rgba(0,0,0,0.5);
       box-sizing: border-box;
     }
-
     #date-box {
       position: absolute;
       top: 20px;
       left: 40px;
       text-align: left;
     }
-
     #date-box .date {
       font-size: 2.2em;
       font-weight: 300;
     }
-
     #date-box .location {
       font-size: 2.8em;
       margin-top: 10px;
     }
-
     #current {
       position: absolute;
       bottom: 80px;
@@ -51,14 +46,12 @@
       font-size: 10em;
       font-weight: 300;
     }
-
     #condition {
       position: absolute;
       bottom: 20px;
       left: 130px;
       font-size: 2em;
     }
-
     #forecast {
       position: absolute;
       bottom: 80px;
@@ -66,7 +59,6 @@
       display: flex;
       gap: 20px;
     }
-
     .day {
       background: rgba(255,255,255,0.15);
       border-radius: 15px;
@@ -76,26 +68,21 @@
       height: 220px;
       backdrop-filter: blur(5px);
     }
-
     .day h3 {
       font-size: 1.3em;
       margin-bottom: 10px;
     }
-
     .icon {
       font-size: 2.2em;
       margin-bottom: 10px;
     }
-
     .temp {
       font-size: 2.1em;
     }
-
     .precip {
       font-size: 1.6em;
       margin-top: 10px;
     }
-
     #news-carousel {
       position: absolute;
       top: 20px;
@@ -107,14 +94,12 @@
       overflow: hidden;
       padding: 10px;
     }
-
     #news-slide img {
       width: 100%;
       height: 320px;
       object-fit: cover;
       border-radius: 5px;
     }
-
     #news-slide .headline {
       margin-top: 8px;
       font-size: 1.4em;
@@ -135,42 +120,46 @@
   </div>
 
   <script>
+    function decodeHtmlEntities(str) {
+      const txt = document.createElement("textarea");
+      txt.innerHTML = str;
+      return txt.value;
+    }
+
     const LAT = 42.8125;
     const LON = -1.6458;
     const forecastDays = 5;
 
-    
-const weatherIcons = {
-  0: { text: "Despejado", icon: "<img src='https://cdn-icons-png.flaticon.com/128/869/869869.png' style='height: 32px;'>", bg: "sunny.jpg" },
-  1: { text: "Principalmente despejado", icon: "<img src='https://cdn-icons-png.flaticon.com/128/1163/1163661.png' style='height: 32px;'>", bg: "sunny.jpg" },
-  2: { text: "Parcialmente nublado", icon: "<img src='https://cdn-icons-png.flaticon.com/128/1163/1163624.png' style='height: 32px;'>", bg: "cloudy.jpg" },
-  3: { text: "Nublado", icon: "<img src='https://cdn-icons-png.flaticon.com/128/414/414825.png' style='height: 32px;'>", bg: "cloudy.jpg" },
-  45: { text: "Niebla", icon: "<img src='https://cdn-icons-png.flaticon.com/128/4005/4005901.png' style='height: 32px;'>", bg: "foggy.jpg" },
-  48: { text: "Niebla con escarcha", icon: "<img src='https://cdn-icons-png.flaticon.com/128/4005/4005901.png' style='height: 32px;'>", bg: "foggy.jpg" },
-  51: { text: "Llovizna ligera", icon: "<img src='https://cdn-icons-png.flaticon.com/128/414/414974.png' style='height: 32px;'>", bg: "rain.jpg" },
-  53: { text: "Llovizna moderada", icon: "<img src='https://cdn-icons-png.flaticon.com/128/414/414974.png' style='height: 32px;'>", bg: "rain.jpg" },
-  55: { text: "Llovizna intensa", icon: "<img src='https://cdn-icons-png.flaticon.com/128/414/414974.png' style='height: 32px;'>", bg: "rain.jpg" },
-  56: { text: "Llovizna helada ligera", icon: "<img src='https://cdn-icons-png.flaticon.com/128/1779/1779940.png' style='height: 32px;'>", bg: "snow.jpg" },
-  57: { text: "Llovizna helada intensa", icon: "<img src='https://cdn-icons-png.flaticon.com/128/1779/1779940.png' style='height: 32px;'>", bg: "snow.jpg" },
-  61: { text: "Lluvia ligera", icon: "<img src='https://cdn-icons-png.flaticon.com/128/1163/1163657.png' style='height: 32px;'>", bg: "rain.jpg" },
-  63: { text: "Lluvia moderada", icon: "<img src='https://cdn-icons-png.flaticon.com/128/1163/1163657.png' style='height: 32px;'>", bg: "rain.jpg" },
-  65: { text: "Lluvia intensa", icon: "<img src='https://cdn-icons-png.flaticon.com/128/1163/1163657.png' style='height: 32px;'>", bg: "rain.jpg" },
-  66: { text: "Lluvia helada ligera", icon: "<img src='https://cdn-icons-png.flaticon.com/128/1779/1779940.png' style='height: 32px;'>", bg: "snow.jpg" },
-  67: { text: "Lluvia helada intensa", icon: "<img src='https://cdn-icons-png.flaticon.com/128/1779/1779940.png' style='height: 32px;'>", bg: "snow.jpg" },
-  71: { text: "Nevada ligera", icon: "<img src='https://cdn-icons-png.flaticon.com/128/642/642102.png' style='height: 32px;'>", bg: "snow.jpg" },
-  73: { text: "Nevada moderada", icon: "<img src='https://cdn-icons-png.flaticon.com/128/642/642102.png' style='height: 32px;'>", bg: "snow.jpg" },
-  75: { text: "Nevada intensa", icon: "<img src='https://cdn-icons-png.flaticon.com/128/642/642102.png' style='height: 32px;'>", bg: "snow.jpg" },
-  77: { text: "Granos de nieve", icon: "<img src='https://cdn-icons-png.flaticon.com/128/1779/1779940.png' style='height: 32px;'>", bg: "snow.jpg" },
-  80: { text: "Chubascos ligeros", icon: "<img src='https://cdn-icons-png.flaticon.com/128/1163/1163636.png' style='height: 32px;'>", bg: "rain.jpg" },
-  81: { text: "Chubascos moderados", icon: "<img src='https://cdn-icons-png.flaticon.com/128/1163/1163636.png' style='height: 32px;'>", bg: "rain.jpg" },
-  82: { text: "Chubascos violentos", icon: "<img src='https://cdn-icons-png.flaticon.com/128/1163/1163636.png' style='height: 32px;'>", bg: "storm.jpg" },
-  85: { text: "Chubascos de nieve ligeros", icon: "<img src='https://cdn-icons-png.flaticon.com/128/642/642102.png' style='height: 32px;'>", bg: "snow.jpg" },
-  86: { text: "Chubascos de nieve intensos", icon: "<img src='https://cdn-icons-png.flaticon.com/128/642/642102.png' style='height: 32px;'>", bg: "snow.jpg" },
-  95: { text: "Tormenta ligera o moderada", icon: "<img src='https://cdn-icons-png.flaticon.com/128/1146/1146869.png' style='height: 32px;'>", bg: "storm.jpg" },
-  96: { text: "Tormenta con granizo ligera", icon: "<img src='https://cdn-icons-png.flaticon.com/128/1146/1146869.png' style='height: 32px;'>", bg: "storm.jpg" },
-  99: { text: "Tormenta con granizo fuerte", icon: "<img src='https://cdn-icons-png.flaticon.com/128/1146/1146869.png' style='height: 32px;'>", bg: "storm.jpg" }
-};
-
+    const weatherIcons = {
+      0: { text: "Despejado", icon: "<img src='https://cdn-icons-png.flaticon.com/128/869/869869.png' style='height: 32px;'>", bg: "sunny.jpg" },
+      1: { text: "Principalmente despejado", icon: "<img src='https://cdn-icons-png.flaticon.com/128/1163/1163661.png' style='height: 32px;'>", bg: "sunny.jpg" },
+      2: { text: "Parcialmente nublado", icon: "<img src='https://cdn-icons-png.flaticon.com/128/1163/1163624.png' style='height: 32px;'>", bg: "cloudy.jpg" },
+      3: { text: "Nublado", icon: "<img src='https://cdn-icons-png.flaticon.com/128/414/414825.png' style='height: 32px;'>", bg: "cloudy.jpg" },
+      45: { text: "Niebla", icon: "<img src='https://cdn-icons-png.flaticon.com/128/4005/4005901.png' style='height: 32px;'>", bg: "foggy.jpg" },
+      48: { text: "Niebla con escarcha", icon: "<img src='https://cdn-icons-png.flaticon.com/128/4005/4005901.png' style='height: 32px;'>", bg: "foggy.jpg" },
+      51: { text: "Llovizna ligera", icon: "<img src='https://cdn-icons-png.flaticon.com/128/414/414974.png' style='height: 32px;'>", bg: "rain.jpg" },
+      53: { text: "Llovizna moderada", icon: "<img src='https://cdn-icons-png.flaticon.com/128/414/414974.png' style='height: 32px;'>", bg: "rain.jpg" },
+      55: { text: "Llovizna intensa", icon: "<img src='https://cdn-icons-png.flaticon.com/128/414/414974.png' style='height: 32px;'>", bg: "rain.jpg" },
+      56: { text: "Llovizna helada ligera", icon: "<img src='https://cdn-icons-png.flaticon.com/128/1779/1779940.png' style='height: 32px;'>", bg: "snow.jpg" },
+      57: { text: "Llovizna helada intensa", icon: "<img src='https://cdn-icons-png.flaticon.com/128/1779/1779940.png' style='height: 32px;'>", bg: "snow.jpg" },
+      61: { text: "Lluvia ligera", icon: "<img src='https://cdn-icons-png.flaticon.com/128/1163/1163657.png' style='height: 32px;'>", bg: "rain.jpg" },
+      63: { text: "Lluvia moderada", icon: "<img src='https://cdn-icons-png.flaticon.com/128/1163/1163657.png' style='height: 32px;'>", bg: "rain.jpg" },
+      65: { text: "Lluvia intensa", icon: "<img src='https://cdn-icons-png.flaticon.com/128/1163/1163657.png' style='height: 32px;'>", bg: "rain.jpg" },
+      66: { text: "Lluvia helada ligera", icon: "<img src='https://cdn-icons-png.flaticon.com/128/1779/1779940.png' style='height: 32px;'>", bg: "snow.jpg" },
+      67: { text: "Lluvia helada intensa", icon: "<img src='https://cdn-icons-png.flaticon.com/128/1779/1779940.png' style='height: 32px;'>", bg: "snow.jpg" },
+      71: { text: "Nevada ligera", icon: "<img src='https://cdn-icons-png.flaticon.com/128/642/642102.png' style='height: 32px;'>", bg: "snow.jpg" },
+      73: { text: "Nevada moderada", icon: "<img src='https://cdn-icons-png.flaticon.com/128/642/642102.png' style='height: 32px;'>", bg: "snow.jpg" },
+      75: { text: "Nevada intensa", icon: "<img src='https://cdn-icons-png.flaticon.com/128/642/642102.png' style='height: 32px;'>", bg: "snow.jpg" },
+      77: { text: "Granos de nieve", icon: "<img src='https://cdn-icons-png.flaticon.com/128/1779/1779940.png' style='height: 32px;'>", bg: "snow.jpg" },
+      80: { text: "Chubascos ligeros", icon: "<img src='https://cdn-icons-png.flaticon.com/128/1163/1163636.png' style='height: 32px;'>", bg: "rain.jpg" },
+      81: { text: "Chubascos moderados", icon: "<img src='https://cdn-icons-png.flaticon.com/128/1163/1163636.png' style='height: 32px;'>", bg: "rain.jpg" },
+      82: { text: "Chubascos violentos", icon: "<img src='https://cdn-icons-png.flaticon.com/128/1163/1163636.png' style='height: 32px;'>", bg: "storm.jpg" },
+      85: { text: "Chubascos de nieve ligeros", icon: "<img src='https://cdn-icons-png.flaticon.com/128/642/642102.png' style='height: 32px;'>", bg: "snow.jpg" },
+      86: { text: "Chubascos de nieve intensos", icon: "<img src='https://cdn-icons-png.flaticon.com/128/642/642102.png' style='height: 32px;'>", bg: "snow.jpg" },
+      95: { text: "Tormenta ligera o moderada", icon: "<img src='https://cdn-icons-png.flaticon.com/128/1146/1146869.png' style='height: 32px;'>", bg: "storm.jpg" },
+      96: { text: "Tormenta con granizo ligera", icon: "<img src='https://cdn-icons-png.flaticon.com/128/1146/1146869.png' style='height: 32px;'>", bg: "storm.jpg" },
+      99: { text: "Tormenta con granizo fuerte", icon: "<img src='https://cdn-icons-png.flaticon.com/128/1146/1146869.png' style='height: 32px;'>", bg: "storm.jpg" }
+    };
 
     async function getWeather() {
       const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current_weather=true&daily=temperature_2m_max,temperature_2m_min,weathercode,precipitation_sum&timezone=Europe%2FMadrid`);
@@ -216,19 +205,16 @@ const weatherIcons = {
         let index = 0;
 
         function showNext() {
-          const item = items[index];
-          const image = item.enclosure?.link?.includes("http") ? item.enclosure.link : "https://placehold.co/800x400?text=Noticia";
           const visibleItems = items.slice(index, index + 3);
-        document.getElementById("news-slide").innerHTML = visibleItems.map(news => {
-          const imgTag = news.enclosure?.link ? `<img src="${news.enclosure.link}" style="width: 200px; height: 120px; object-fit: cover; border-radius: 5px; margin-right: 20px;">` : '';
-          return `
-            <div style="display: flex; align-items: center; margin-bottom: 35px;">
-              ${imgTag}
-              <div style="font-size: 2em;">${news.title}</div>
-            </div>`;
-        }).join('');
-        index = (index + 3) % items.length;
-          index = (index + 1) % items.length;
+          document.getElementById("news-slide").innerHTML = visibleItems.map(news => {
+            const imgTag = news.enclosure?.link ? `<img src="${news.enclosure.link}" style="width: 200px; height: 120px; object-fit: cover; border-radius: 5px; margin-right: 20px;">` : '';
+            return `
+              <div style="display: flex; align-items: center; margin-bottom: 35px;">
+                ${imgTag}
+                <div style="font-size: 2em;">${decodeHtmlEntities(news.title)}</div>
+              </div>`;
+          }).join('');
+          index = (index + 3) % items.length;
         }
 
         showNext();
@@ -243,3 +229,4 @@ const weatherIcons = {
   </script>
 </body>
 </html>
+
