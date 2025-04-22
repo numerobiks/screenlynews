@@ -36,7 +36,7 @@
       font-weight: 300;
     }
     #date-box .location {
-      font-size: 2.8em;
+      font-size: 4em;
       margin-top: 10px;
     }
     #current {
@@ -192,16 +192,21 @@
           <h3>${day}</h3>
           <div class="icon">${winfo.icon}</div>
           <div class="temp">${max}° / ${min}°</div>
-          <div class="precip">💧 ${precip} mm</div>`;
+          <div class="precip"><img src='https://cdn-icons-png.flaticon.com/128/414/414974.png' style="height: 32px; vertical-align: middle; margin-right: 8px;"> ${precip} mm</div>`;
         forecast.appendChild(div);
       }
     }
 
     async function startNewsCarousel() {
       try {
-        const res = await fetch("https://api.rss2json.com/v1/api.json?rss_url=https://www.20minutos.es/rss/ultimas-noticias/");
-        const data = await res.json();
-        const items = data.items.slice(0, 6);
+        
+        const res20m = await fetch("https://api.rss2json.com/v1/api.json?rss_url=https://www.20minutos.es/rss/ultimas-noticias/");
+        const resCNN = await fetch("https://api.rss2json.com/v1/api.json?rss_url=http://rss.cnn.com/rss/edition.rss");
+        const data20m = await res20m.json();
+        const dataCNN = await resCNN.json();
+        const combined = [...data20m.items.slice(0, 5), ...dataCNN.items.slice(0, 5)];
+        const items = combined.sort(() => Math.random() - 0.5);
+    
         let index = 0;
 
         function showNext() {
