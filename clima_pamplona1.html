@@ -1,77 +1,137 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Tiempo en Pamplona</title>
+  <title>Clima Pamplona + Noticias</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300&display=swap" rel="stylesheet">
   <style>
     html, body {
       margin: 0;
       padding: 0;
       height: 100%;
-      font-family: 'Segoe UI', sans-serif;
-      color: #fff;
+      width: 100%;
+      font-family: 'Lato', sans-serif;
       background-size: cover;
       background-position: center;
+      color: white;
+      overflow: hidden;
     }
 
     .overlay {
-      background-color: rgba(0, 0, 0, 0.55);
+      position: absolute;
       width: 100%;
       height: 100%;
-      padding: 20px;
+      background-color: rgba(0,0,0,0.5);
       box-sizing: border-box;
     }
 
-    h1 {
-      font-size: 3em;
-      margin-top: 0;
-      text-align: center;
+    #date-box {
+      position: absolute;
+      top: 20px;
+      left: 40px;
+      text-align: left;
+    }
+
+    #date-box .date {
+      font-size: 2.2em;
+      font-weight: 300;
+    }
+
+    #date-box .location {
+      font-size: 2.8em;
+      margin-top: 10px;
     }
 
     #current {
-      text-align: center;
-      font-size: 1.8em;
-      margin-bottom: 30px;
+      position: absolute;
+      bottom: 30px;
+      left: 40px;
+      font-size: 10em;
+      font-weight: 300;
+    }
+
+    #condition {
+      position: absolute;
+      bottom: 20px;
+      left: 130px;
+      font-size: 2em;
     }
 
     #forecast {
+      position: absolute;
+      bottom: 30px;
+      right: 40px;
       display: flex;
-      justify-content: center;
       gap: 20px;
-      flex-wrap: wrap;
     }
 
     .day {
-      background: rgba(255, 255, 255, 0.15);
-      border-radius: 10px;
-      padding: 15px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 15px;
+      padding: 20px;
       text-align: center;
-      width: 150px;
+      width: 180px;
+      height: 220px;
       backdrop-filter: blur(5px);
     }
 
     .day h3 {
-      margin: 0;
-      font-size: 1.2em;
-    }
-
-    .temp, .precip {
-      font-size: 1.1em;
-      margin-top: 5px;
+      font-size: 1.3em;
+      margin-bottom: 10px;
     }
 
     .icon {
-      width: 48px;
-      height: 48px;
+      font-size: 2.2em;
+      margin-bottom: 10px;
+    }
+
+    .temp {
+      font-size: 2.1em;
+    }
+
+    .precip {
+      font-size: 1.6em;
+      margin-top: 10px;
+    }
+
+    #news-carousel {
+      position: absolute;
+      top: 20px;
+      left: 700px;
+      width: 1150px;
+      height: 500px;
+      background: rgba(0,0,0,0.4);
+      border-radius: 10px;
+      overflow: hidden;
+      padding: 10px;
+    }
+
+    #news-slide img {
+      width: 100%;
+      height: 320px;
+      object-fit: cover;
+      border-radius: 5px;
+    }
+
+    #news-slide .headline {
+      margin-top: 8px;
+      font-size: 1.4em;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
   <div class="overlay">
-    <h1>Tiempo en Pamplona</h1>
-    <div id="current">Cargando...</div>
+    <div id="date-box">
+      <div class="date" id="today-text">--</div>
+      <div class="location">Pamplona</div>
+    </div>
+    <div id="current">--°</div>
+    <div id="condition"></div>
     <div id="forecast"></div>
+    <div id="news-carousel"><div id="news-slide"></div></div>
   </div>
 
   <script>
@@ -79,73 +139,109 @@
     const LON = -1.6458;
     const forecastDays = 5;
 
-    const weatherIcons = {
-      0: { text: "Despejado", icon: "☀️", bg: "sunny.jpg" },
-      1: { text: "Principalmente despejado", icon: "🌤️", bg: "sunny.jpg" },
-      2: { text: "Parcialmente nublado", icon: "⛅", bg: "cloudy.jpg" },
-      3: { text: "Nublado", icon: "☁️", bg: "cloudy.jpg" },
-      45: { text: "Niebla", icon: "🌫️", bg: "foggy.jpg" },
-      48: { text: "Niebla con escarcha", icon: "🌫️", bg: "foggy.jpg" },
-      51: { text: "Llovizna ligera", icon: "🌦️", bg: "rain.jpg" },
-      53: { text: "Llovizna moderada", icon: "🌧️", bg: "rain.jpg" },
-      55: { text: "Llovizna intensa", icon: "🌧️", bg: "rain.jpg" },
-      56: { text: "Llovizna helada ligera", icon: "🌧️", bg: "snow.jpg" },
-      57: { text: "Llovizna helada intensa", icon: "🌧️", bg: "snow.jpg" },
-      61: { text: "Lluvia ligera", icon: "🌧️", bg: "rain.jpg" },
-      63: { text: "Lluvia moderada", icon: "🌧️", bg: "rain.jpg" },
-      65: { text: "Lluvia intensa", icon: "🌧️", bg: "rain.jpg" },
-      66: { text: "Lluvia helada ligera", icon: "🌧️", bg: "snow.jpg" },
-      67: { text: "Lluvia helada intensa", icon: "🌧️", bg: "snow.jpg" },
-      71: { text: "Nevada ligera", icon: "🌨️", bg: "snow.jpg" },
-      73: { text: "Nevada moderada", icon: "🌨️", bg: "snow.jpg" },
-      75: { text: "Nevada intensa", icon: "❄️", bg: "snow.jpg" },
-      77: { text: "Granizo", icon: "🌨️", bg: "snow.jpg" },
-      80: { text: "Chubascos ligeros", icon: "🌦️", bg: "rain.jpg" },
-      81: { text: "Chubascos moderados", icon: "🌧️", bg: "rain.jpg" },
-      82: { text: "Chubascos violentos", icon: "🌧️", bg: "storm.jpg" },
-      85: { text: "Chubascos de nieve ligera", icon: "🌨️", bg: "snow.jpg" },
-      86: { text: "Chubascos de nieve intensa", icon: "❄️", bg: "snow.jpg" },
-      95: { text: "Tormenta ligera o moderada", icon: "⛈️", bg: "storm.jpg" },
-      96: { text: "Tormenta con granizo ligera", icon: "⛈️", bg: "storm.jpg" },
-      99: { text: "Tormenta con granizo fuerte", icon: "⛈️", bg: "storm.jpg" }
-    };
+    
+const weatherIcons = {
+  0: { text: "Despejado", icon: "☀️", bg: "sunny.jpg" },
+  1: { text: "Principalmente despejado", icon: "🌤️", bg: "sunny.jpg" },
+  2: { text: "Parcialmente nublado", icon: "⛅", bg: "cloudy.jpg" },
+  3: { text: "Nublado", icon: "☁️", bg: "cloudy.jpg" },
+  45: { text: "Niebla", icon: "🌫️", bg: "foggy.jpg" },
+  48: { text: "Niebla con escarcha", icon: "🌫️", bg: "foggy.jpg" },
+  51: { text: "Llovizna ligera", icon: "🌦️", bg: "rain.jpg" },
+  53: { text: "Llovizna moderada", icon: "🌧️", bg: "rain.jpg" },
+  55: { text: "Llovizna intensa", icon: "🌧️", bg: "rain.jpg" },
+  56: { text: "Llovizna helada ligera", icon: "🌧️", bg: "snow.jpg" },
+  57: { text: "Llovizna helada intensa", icon: "🌧️", bg: "snow.jpg" },
+  61: { text: "Lluvia ligera", icon: "🌧️", bg: "rain.jpg" },
+  63: { text: "Lluvia moderada", icon: "🌧️", bg: "rain.jpg" },
+  65: { text: "Lluvia intensa", icon: "🌧️", bg: "rain.jpg" },
+  66: { text: "Lluvia helada ligera", icon: "🌧️", bg: "snow.jpg" },
+  67: { text: "Lluvia helada intensa", icon: "🌧️", bg: "snow.jpg" },
+  71: { text: "Nevada ligera", icon: "🌨️", bg: "snow.jpg" },
+  73: { text: "Nevada moderada", icon: "🌨️", bg: "snow.jpg" },
+  75: { text: "Nevada intensa", icon: "❄️", bg: "snow.jpg" },
+  77: { text: "Granos de nieve", icon: "❄️", bg: "snow.jpg" },
+  80: { text: "Chubascos ligeros", icon: "🌦️", bg: "rain.jpg" },
+  81: { text: "Chubascos moderados", icon: "🌧️", bg: "rain.jpg" },
+  82: { text: "Chubascos violentos", icon: "🌧️", bg: "storm.jpg" },
+  85: { text: "Chubascos de nieve ligeros", icon: "🌨️", bg: "snow.jpg" },
+  86: { text: "Chubascos de nieve intensos", icon: "❄️", bg: "snow.jpg" },
+  95: { text: "Tormenta ligera o moderada", icon: "⛈️", bg: "storm.jpg" },
+  96: { text: "Tormenta con granizo ligera", icon: "⛈️", bg: "storm.jpg" },
+  99: { text: "Tormenta con granizo fuerte", icon: "⛈️", bg: "storm.jpg" }
+};
+
 
     async function getWeather() {
-      const url = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current_weather=true&daily=temperature_2m_max,temperature_2m_min,weathercode,precipitation_sum&timezone=Europe%2FMadrid`;
-      const res = await fetch(url);
+      const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current_weather=true&daily=temperature_2m_max,temperature_2m_min,weathercode,precipitation_sum&timezone=Europe%2FMadrid`);
       const data = await res.json();
 
+      const today = new Date();
+      document.getElementById("today-text").textContent = today.toLocaleDateString("es-ES", {
+        weekday: "long", day: "numeric", month: "long"
+      });
+
       const current = data.current_weather;
-      const currentCode = current.weathercode;
-      const currentInfo = weatherIcons[currentCode] || { text: "Condición desconocida", icon: "❓", bg: "default.jpg" };
-      console.log("Código actual del clima:", currentCode);
-
-      document.body.style.backgroundImage = `url('https://numerobiks.github.io/screenlynews/img/${currentInfo.bg}')`;
-
-      document.getElementById("current").textContent = `Ahora: ${current.temperature}°C, Viento: ${current.windspeed} km/h – ${currentInfo.text}`;
+      const code = current.weathercode;
+      const info = weatherIcons[code] || { text: "", icon: "❓", bg: "default.jpg" };
+      document.body.style.backgroundImage = `url('https://numerobiks.github.io/screenlynews/img/${info.bg}')`;
+      document.getElementById("current").textContent = `${current.temperature}°`;
+      document.getElementById("condition").textContent = `${info.icon} ${info.text}`;
 
       const daily = data.daily;
       const forecast = document.getElementById("forecast");
       for (let i = 0; i < forecastDays; i++) {
-        const date = new Date(daily.time[i]);
-        const name = date.toLocaleDateString("es-ES", { weekday: "short" });
-        const code = daily.weathercode[i];
-        const info = weatherIcons[code] || { text: "Desconocido", icon: "❓" };
+        const day = new Date(daily.time[i]).toLocaleDateString("es-ES", { weekday: "long", day: "numeric", month: "short" });
+        const wcode = daily.weathercode[i];
+        const winfo = weatherIcons[wcode] || { icon: "❓", text: "" };
+        const max = daily.temperature_2m_max[i];
+        const min = daily.temperature_2m_min[i];
+        const precip = daily.precipitation_sum[i];
+        const div = document.createElement("div");
+        div.className = "day";
+        div.innerHTML = `
+          <h3>${day}</h3>
+          <div class="icon">${winfo.icon}</div>
+          <div class="temp">${max}° / ${min}°</div>
+          <div class="precip">💧 ${precip} mm</div>`;
+        forecast.appendChild(div);
+      }
+    }
 
-        const day = document.createElement("div");
-        day.className = "day";
-        day.innerHTML = `
-          <h3>${name}</h3>
-          <div class="icon">${info.icon}</div>
-          <div>${info.text}</div>
-          <div class="temp">${daily.temperature_2m_max[i]}° / ${daily.temperature_2m_min[i]}°</div>
-          <div class="precip">💧 ${daily.precipitation_sum[i]} mm</div>
-        `;
-        forecast.appendChild(day);
+    async function startNewsCarousel() {
+      try {
+        
+        const res = await fetch("https://api.rss2json.com/v1/api.json?rss_url=https://www.20minutos.es/rss/ultimas-noticias/");
+        const data = await res.json();
+        const items = data.items.slice(0, 6);
+    
+        let index = 0;
+
+        function showNext() {
+          const item = items[index];
+          const image = item.enclosure?.link?.includes("http") ? item.enclosure.link : "https://placehold.co/800x400?text=Noticia";
+          const visibleItems = items.slice(index, index + 3);
+        document.getElementById("news-slide").innerHTML = visibleItems.map(news => {
+          const imgTag = news.enclosure?.link ? `<img src="${news.enclosure.link}" style="width: 200px; height: 120px; object-fit: cover; border-radius: 5px; margin-right: 20px;">` : '';
+          return `
+            <div style="display: flex; align-items: center; margin-bottom: 35px;">
+              ${imgTag}
+              <div style="font-size: 2em;">${new DOMParser().parseFromString(news.title, "text/html").body.textContent}</div>
+            </div>`;
+        }).join('');
+        index = (index + 3) % items.length;
+          index = (index + 1) % items.length;
+        }
+
+        showNext();
+        setInterval(showNext, 7000);
+      } catch (e) {
+        document.getElementById("news-slide").innerHTML = "<p>No se pudieron cargar las noticias.</p>";
       }
     }
 
     getWeather();
+    startNewsCarousel();
   </script>
 </body>
 </html>
