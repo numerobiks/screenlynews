@@ -112,8 +112,9 @@
     <div id="date-box">
       <div class="date" id="today-text">--</div>
       <div class="location">Pamplona</div>
+      <div id="clock" style="font-size: 5em; margin-top: 25px;">--:--</div>
     </div>
-    <div id="current">--°</div>
+    <div id="current" style="left: 65px;">--°C</div>
     <div id="condition"></div>
     <div id="forecast"></div>
     <div id="news-carousel"><div id="news-slide"></div></div>
@@ -174,7 +175,7 @@
       const code = current.weathercode;
       const info = weatherIcons[code] || { text: "", icon: "❓", bg: "default.jpg" };
       document.body.style.backgroundImage = `url('https://numerobiks.github.io/screenlynews/img/${info.bg}')`;
-      document.getElementById("current").textContent = `${current.temperature}°`;
+      document.getElementById("current").textContent = `${current.temperature}°C`;
       document.getElementById("condition").innerHTML = `<span style="vertical-align: middle;">${info.icon.replace('height: 32px', 'height: 60px')}</span> <span>${info.text}</span>`;
 
       const daily = data.daily;
@@ -191,7 +192,7 @@
         div.innerHTML = `
           <h3>${day}</h3>
           <div class="icon">${winfo.icon}</div>
-          <div class="temp">${max}° / ${min}°</div>
+          <div class="temp"><div>${max}°</div><div style="font-size: 0.8em;">${min}°</div></div>
           <div class="precip"><img src='https://cdn-icons-png.flaticon.com/128/414/414974.png' style="height: 32px; vertical-align: middle; margin-right: 8px;"> ${precip} mm</div>`;
         forecast.appendChild(div);
       }
@@ -228,6 +229,16 @@
         document.getElementById("news-slide").innerHTML = "<p>No se pudieron cargar las noticias.</p>";
       }
     }
+
+    
+    // Reloj en tiempo real
+    function updateClock() {
+      const now = new Date();
+      const timeString = now.toLocaleTimeString("es-ES", { hour: '2-digit', minute: '2-digit' });
+      document.getElementById("clock").textContent = timeString;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
 
     getWeather();
     startNewsCarousel();
