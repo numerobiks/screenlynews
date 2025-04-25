@@ -202,7 +202,7 @@
       try {
         
         const res20m = await fetch("https://api.rss2json.com/v1/api.json?rss_url=https://www.20minutos.es/rss/ultimas-noticias/");
-        const resCNN = await fetch("https://api.rss2json.com/v1/api.json?rss_url=https://rss.cnn.com/rss/cnn_latest.rss");
+        const resCNN = await fetch("https://api.rss2json.com/v1/api.json?rss_url=http://feeds.bbci.co.uk/mundo/rss.xml");
         const data20m = await res20m.json();
         const dataCNN = await resCNN.json();
         const combined = [...data20m.items.slice(0, 5), ...dataCNN.items.slice(0, 5)];
@@ -249,6 +249,4 @@
   </script>
 </body>
 </html>
-
-
 
