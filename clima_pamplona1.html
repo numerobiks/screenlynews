@@ -201,7 +201,7 @@
     async function startNewsCarousel() {
       try {
         
-        const res20m = await fetch("https://api.rss2json.com/v1/api.json?rss_url=https://feeds.reuters.com/Reuters/worldNews");
+        const res20m = await fetch("https://api.rss2json.com/v1/api.json?rss_url=https://es.euronews.com/rss?level=theme&name=home");
         const resCNN = await fetch("https://api.rss2json.com/v1/api.json?rss_url=http://feeds.bbci.co.uk/mundo/rss.xml");
         const data20m = await res20m.json();
         const dataCNN = await resCNN.json();
